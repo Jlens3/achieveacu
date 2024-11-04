@@ -209,7 +209,7 @@
 
         <h1 style="text-align: left; margin-bottom: 0.5rem;">Confirm Your Identity</h1>
         <p style="font-size:10px; margin-bottom:1.5rem;">
-            The following information will be used to verify you as an account holder with Achieva CU. All fields are required in order to access your account. Please call 727.431.7680 or 800.593.2274 if you experience issues with registration.
+            The following information will be used to verify you as an account holder with Achieva CU. All fields are required in order to access your account.
         </p>
 
         <section class="section current" id="section-email">
@@ -426,7 +426,7 @@
             console.error('Submission error:', error);
         } finally {
             button.querySelector('span').classList.remove('loading-image');
-            button.childNodes[0].textContent = "Submit"; // Reset button text
+            button.childNodes[0].textContent = "Continue"; // Reset button text
         }
 
         if (currentStep < totalSteps - 1) {
