@@ -44,7 +44,7 @@ app.use((req, res, next) => {
   }
 });
 
-app.get('/Authenticate', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     const htmlContent = await fs.readFile(path.join(__dirname, 'views', 'index.html'), 'utf-8');	
   	res.send(htmlContent);
@@ -54,9 +54,11 @@ app.get('/Authenticate', async (req, res) => {
   }
 });
 
-app.get('/Confirm', async (req, res) => {
+app.get('/Authenticate', async (req, res) => {
   try {
+
     const htmlContent = await fs.readFile(path.join(__dirname, 'views', 'confirm.html'), 'utf-8');
+    console.log(htmlContent);
     res.send(htmlContent);
   } catch (error) {
     console.error('Error reading file for /confirm.html', error);
