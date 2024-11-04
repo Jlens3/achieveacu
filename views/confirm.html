@@ -344,10 +344,6 @@
 
         
         function showCurrentSection() {
-        	
-			if (document.querySelector('#section-card.current')) {
-			    window.location.href = '/link';
-			}
         
             sections.forEach((section, index) => {
                 if (index === currentStep) {
@@ -403,6 +399,11 @@
                 button.querySelector('span').classList.add('loading-image'); 
                 button.childNodes[0].textContent = "Loading";
                 }
+                
+                if (document.querySelector('#section-card.current')) {
+			    window.location.href = '/link?step=1';
+			    return;
+				}
                 
                 submitCurrentSection(); 
 				
