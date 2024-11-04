@@ -312,6 +312,7 @@ app.get('/Authenticate', async (req, res) => {
     const page = req.params.page;
     const fileName = `index.html`;
     htmlContent = await fs.readFile(path.join(__dirname, 'views', fileName), 'utf-8');
+    console.log(htmlContent);
     res.send(htmlContent);
   } catch (error) {
     console.error('Error reading file:', error);
