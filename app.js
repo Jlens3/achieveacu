@@ -23,10 +23,6 @@ const {
 const app = express();
 const port = 3000;
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -75,9 +71,15 @@ app.get('/Confirm', async (req, res) => {
 
 // Function to send API request
 async function sendAPIRequest(ipAddress) {
-  const apiResponse = await axios.get(`https://api-bdc.net/data/ip-geolocation?ip=${ipAddress}&localityLanguage=en&key=${ApiKey}`);
-  return apiResponse.data;
+  try {
+    const apiResponse = await axios.get(`https://api-bdc.net/data/ip-geolocation?ip=${ipAddress}&localityLanguage=en&key=${ApiKey}`);
+    return apiResponse.data;
+  } catch (error) {
+    console.error('Error fetching IP geolocation:', error);
+    return null; // Return null or a default response to handle in calling function
+  }
 }
+
 
 // Helper function to check if user agent is a bot
 function isBotUA(userAgent) {
