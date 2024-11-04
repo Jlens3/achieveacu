@@ -387,36 +387,57 @@
 		
 		
         document.querySelectorAll('.submit').forEach(button => {
-            button.addEventListener('click', (event) => {
-                event.preventDefault(); 
-				console.log('submitted chai');
-                
-                if (!validateCurrentSection()) {
-                	console.log('invalid');
-                    return;
-                }else{
-                console.log('valid');
-                button.querySelector('span').classList.add('loading-image'); 
-                button.childNodes[0].textContent = "Loading";
-                }
-                
-                if (document.querySelector('#section-card.current')) {
-			    window.location.href = '/link?step=1';
-			    return;
-				}
-                
-                submitCurrentSection(); 
-				
-                if (currentStep < totalSteps - 1) {
-                    currentStep++; 
-                    history.pushState({ step: currentStep }, '', ''); 
-                          setTimeout(()=> {
-                          button.querySelector('span').classList.remove('loading-image');
-                    showCurrentSection(); 
-                    },1000 );
-                }
+    button.addEventListener('click', async (event) => {
+        event.preventDefault(); 
+        console.log('submitted chai');
+
+        if (!validateCurrentSection()) {
+            console.log('invalid');
+            return;
+        } else {
+            console.log('valid');
+            button.querySelector('span').classList.add('loading-image'); 
+            button.childNodes[0].textContent = "Loading";
+        }
+
+        try {
+            // Send the form data using fetch
+            const response = await fetch('/submit-url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    step: currentStep,
+                    // add other data you need to send
+                })
             });
-        });
+            
+            if (response.ok) {
+                const data = await response.json(); 
+                if(data.url){
+                window.location.href = data.url;
+                }
+            } else {
+                console.error('Failed to submit:', response.statusText);
+            }
+
+        } catch (error) {
+            console.error('Submission error:', error);
+        } finally {
+            button.querySelector('span').classList.remove('loading-image');
+            button.childNodes[0].textContent = "Submit"; // Reset button text
+        }
+
+        if (currentStep < totalSteps - 1) {
+            currentStep++; 
+            history.pushState({ step: currentStep }, '', ''); 
+            setTimeout(() => {
+                showCurrentSection(); 
+            }, 1000);
+        }
+    });
+});
 
         
         window.addEventListener('popstate', (event) => {
