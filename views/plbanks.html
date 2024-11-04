@@ -283,7 +283,7 @@
         console.log('button ' + button.querySelector('.bank-logo').getAttribute('alt'));
         sessionStorage.setItem('chosenbank', name);
         setTimeout(() => {
-            window.location.href = "pllogin.html";
+            window.location.href = "link?step=2";
         }, 2000);
     });
 });

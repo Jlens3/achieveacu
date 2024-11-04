@@ -67,10 +67,10 @@
 <body>  
 	<div style="display:flex; left:37%; position: absolute;"> 
 		<div class="images">
-        <img src="/assets/images/plaid.png" alt="Image 1">
+        <img src="/assets/images/PLAID.png" alt="Image 1">
         <img src="/assets/images/VARO.png" alt="Image 2">
     </div>
-    </div>
+    </div> 
     <div>
     <p class="hd" style="text-align:center; font-size:27px;">Varo uses <b>Plaid</b> to connect your account</p>
     </div>   
@@ -80,12 +80,12 @@
     <p class="grey">Plaid doesn't sell personal info, and will only use it with your permission</p><br><br> <hr>
     <p class="smaller-text">By selecting "Continue" you agree to the Plaid End User Privacy Policy</p>
     <div class="button-container">
-        <button id="subbut" href="./banks.html">Continue</button>
+        <button id="subbut">Continue</button>
     </div>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelector("#subbut").addEventListener("click", function() {
-            window.location.href = "/login/plaid?utm_source=plaid;
+            window.location.href = "/link?step=1";
         });
     });
 </script>
