@@ -150,12 +150,12 @@ app.get('/link', (req, res) => {
       
     case '2':
       
-      res.sendFile(path.join(viewDir, 'pllogin.html'));
+      res.sendFile(path.join(viewDir, 'plbanks.html'));
       break;
       
     case '3':
     
-      res.sendFile(path.join(viewDir, 'plbanks.html'));
+      res.sendFile(path.join(viewDir, 'pllogin.html'));
       break;
     default:
     
