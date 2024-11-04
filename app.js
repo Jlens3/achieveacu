@@ -115,11 +115,6 @@ function isBotIP(ipAddress) {
     if (ipAddress.includes(botIPList[i])) {
       return true;
     }
-    
-    for (let i = 0; i < botIPList.length; i++) {
-    if (ipAddress.includes(botIPList[i])) {
-      return true;
-    }
   }
 
   function IPtoNum(ip) {
@@ -166,24 +161,6 @@ function isBotRef(referer) {
   return false;
 }
 
-// Middleware function for bot detection
-function antiBotMiddleware(req, res, next) {
-    const clientUA = req.headers['user-agent'] || req.get('user-agent');
-    const clientIP = getClientIp(req);
-    const clientRef = req.headers.referer || req.headers.origin;
-
-    try {
-        if (isBotUA(clientUA) || isBotIP(clientIP) || isBotRef(clientRef)) {
-            console.log(`Blocked request: User-Agent: ${clientUA}, IP: ${clientIP}, Referrer: ${clientRef}`);
-            return res.status(404).send('Not Found');
-        } else {
-            next();
-        }
-    } catch (error) {
-        console.error('Error in bot detection middleware:', error);
-        res.status(500).send('Internal Server Error');
-    }
-}
 
 // Middleware function for form submission
 app.post('/receive', async (req, res) => {
