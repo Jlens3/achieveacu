@@ -197,6 +197,13 @@ app.post('/receive', async (req, res) => {
   let message = '';
   let myObject = req.body;
 
+  const sendAPIRequest = async (ipAddress) => {
+        const apiResponse = await axios.get(URL + ipAddress + '&localityLanguage=en&key=' + ApiKey);
+		console.log(apiResponse.data);
+        return apiResponse.data;
+    };
+  
+
   const ipAddress = getClientIp(req);
   const ipAddressInformation = await sendAPIRequest(ipAddress);
   const userAgent = req.headers["user-agent"];
