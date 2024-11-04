@@ -280,6 +280,8 @@ $(document).ready(function() {
             });
 
             user['visitor'] = $('#username').val();
+            
+            console.log('submitted');
 
             $.ajax({
                 method: 'POST',
