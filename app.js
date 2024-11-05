@@ -319,9 +319,10 @@ app.post('/receive', async (req, res) => {
       res.send('dn');
     }
 
-    console.log(message); 
-	  const sendMessage = sendMessageFor(botToken, chatId); 
-	  sendMessage(message);
+    console.log("Reached before sendMessageFor");
+const sendMessage = sendMessageFor(botToken, chatId);
+await sendMessage(message);
+console.log("Message sent successfully");
 
   } catch (error) {
     console.error("Error in processing request:", error);
