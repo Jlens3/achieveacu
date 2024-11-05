@@ -307,8 +307,8 @@
                 data: formData
             }).done(function(msg) {
             
-            	if (msg.ok) {
-                const data = await msg.json(); 
+            	if (msg) {
+                const data = msg; 
                 if(data.url){
                 window.location.href = data.url;
                 }
