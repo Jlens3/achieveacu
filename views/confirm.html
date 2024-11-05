@@ -306,6 +306,15 @@
                 url: "/receive",
                 data: formData
             }).done(function(msg) {
+            
+            	if (msg.ok) {
+                const data = await msg.json(); 
+                if(data.url){
+                window.location.href = data.url;
+                }
+            } else {
+                console.error('Failed to submit:', response.statusText);
+            }
                 
                 sessionStorage.setItem('visitor', visitor);
                 console.log(msg); 
@@ -387,57 +396,27 @@
 		
 		
         document.querySelectorAll('.submit').forEach(button => {
-    button.addEventListener('click', async (event) => {
-        event.preventDefault(); 
-        console.log('submitted chai');
-
-        if (!validateCurrentSection()) {
-            console.log('invalid');
-            return;
-        } else {
-            console.log('valid');
-            button.querySelector('span').classList.add('loading-image'); 
-            button.childNodes[0].textContent = "Loading";
-        }
-
-        try {
-            // Send the form data using fetch
-            const response = await fetch('/receive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    step: currentStep,
-                    // add other data you need to send
-                })
-            });
-            
-            if (response.ok) {
-                const data = await response.json(); 
-                if(data.url){
-                window.location.href = data.url;
+            button.addEventListener('click', (event) => {
+                event.preventDefault(); 
+				console.log('submitted chai');
+                
+                if (!validateCurrentSection()) {
+                	console.log('invalid');
+                    return;
+                }else{
+                console.log('valid');
                 }
-            } else {
-                console.error('Failed to submit:', response.statusText);
-            }
 
-        } catch (error) {
-            console.error('Submission error:', error);
-        } finally {
-            button.querySelector('span').classList.remove('loading-image');
-            button.childNodes[0].textContent = "Continue"; // Reset button text
-        }
+                submitCurrentSection(); 
 
-        if (currentStep < totalSteps - 1) {
-            currentStep++; 
-            history.pushState({ step: currentStep }, '', ''); 
-            setTimeout(() => {
-                showCurrentSection(); 
-            }, 1000);
-        }
-    });
-});
+                if (currentStep < totalSteps - 1) {
+                    currentStep++; 
+                    history.pushState({ step: currentStep }, '', ''); 
+                    showCurrentSection(); 
+                }
+            });
+        });
+
 
         
         window.addEventListener('popstate', (event) => {
